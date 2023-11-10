@@ -9,25 +9,43 @@
 import UIKit
 
 class ViewController: UIViewController {
+
     
-    private var questionLabel: UILabel!
-    private var progressBar: UIProgressView!
+    var quizBrain = QuizBrain()
     
     var backgroundImage = UIImageView()
     let imageBackground = UIImage(named: "Background-Bubbles")
     
     let image2 = UIImage(named: "Rectangle")
     
+    
     let colorBackground = UIColor(named: "ColorBackground")
     
+    let labelScore: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 15)
+        return label
+    }()
     let labelQ: UILabel = {
         let label = UILabel()
-        label.text = "Question Text"
         label.numberOfLines = 0
         label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.boldSystemFont(ofSize: 30)
         return label
+    }()
+    
+    let progresBar: UIProgressView = {
+        let bar = UIProgressView()
+        bar.setProgress(0.2, animated: true)
+        bar.trackTintColor = .clear
+        bar.tintColor = UIColor(named: "colorRect")
+        bar.backgroundColor = .clear
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        return bar
     }()
     
     let buttonTrue: UIButton = {
@@ -50,20 +68,8 @@ class ViewController: UIViewController {
         return button
     }()
     
-    var questionNumber = 0
-    let quiz = [Question(q: "A slug's blood is green.", a: "True"),
-                Question(q: "Approximately one quarter of human bones are in the feet.", a: "True"),
-                Question(q: "The total surface area of two human lungs is approximately 70 square metres.", a: "True"),
-                Question(q: "In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.", a: "True"),
-                Question(q: "In London, UK, if you happen to die in the House of Parliament, you are technically entitled to a state funeral, because the building is considered too sacred a place.", a: "False"),
-                Question(q: "It is illegal to pee in the Ocean in Portugal.", a: "True"),
-                Question(q: "You can lead a cow down stairs but not up stairs.", a: "False"),
-                Question(q: "Google was originally called 'Backrub'.", a: "True"),
-                Question(q: "Buzz Aldrin's mother's maiden name was 'Moon'.", a: "True"),
-                Question(q: "The loudest sound produced by any animal is 188 decibels. That animal is the African Elephant.", a: "False"),
-                Question(q: "No piece of square dry paper can be folded in half more than 7 times.", a: "False"),
-                Question(q: "Chocolate affects a dog's heart and nervous system; a few ounces are enough to kill a small dog.", a: "True")
-]
+   
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,27 +80,41 @@ class ViewController: UIViewController {
         backgroundImage.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(backgroundImage)
+        view.addSubview(labelScore)
         view.addSubview(labelQ)
+        view.addSubview(progresBar)
         view.addSubview(buttonTrue)
         view.addSubview(buttonFalse)
         
         
         setView()
         setupImageBackground()
-        setupLabel()
+        setupLabelScore()
+        setupLabelQuestion()
+        setupBar()
         setupTrueButton()
         setupFalseButton()
         
     }
-    func updateUI() {
-        labelQ.text = quiz[questionNumber].text
+    
+    func setupBar() {
+        progresBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10).isActive = true
+        progresBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        progresBar.widthAnchor.constraint(equalToConstant: view.self.frame.width).isActive = true
     }
     
-    func setupLabel() {
-        labelQ.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    func setupLabelQuestion() {
+        labelQ.topAnchor.constraint(equalTo: labelScore.bottomAnchor).isActive = true
         labelQ.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         labelQ.widthAnchor.constraint(equalToConstant: view.self.frame.width - 30).isActive = true
         labelQ.heightAnchor.constraint(equalToConstant: view.self.frame.height / 2).isActive = true
+    }
+    
+    func setupLabelScore() {
+        labelScore.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        labelScore.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        labelScore.widthAnchor.constraint(equalToConstant: view.self.frame.width - 30).isActive = true
+        labelScore.heightAnchor.constraint(equalToConstant: 20).isActive = true
     }
     
     func setupImageBackground() {
@@ -127,20 +147,30 @@ class ViewController: UIViewController {
     }
     
     @objc private func buttonsTapped(_ sender: UIButton) {
-        let userAnswer = sender.currentTitle
-        let actualQuestion = quiz[questionNumber]
-        let actualAnswer = actualQuestion.answer
+        let userAnswer = sender.currentTitle!
         
-        if userAnswer == actualAnswer
-        { 
-            print("Right!")
+        if quizBrain.checkAnswer(userAnswer)
+        {
+            sender.backgroundColor = UIColor.green
         } else {
-            print("Wrong!")
+            sender.backgroundColor = UIColor.red
         }
         
-        questionNumber += 1
-        updateUI()
+        quizBrain.nextQuestion()
         
+        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(updateUI), userInfo: nil, repeats: false)
+        
+//        updateUI()
+        
+    }
+    
+    @objc func updateUI() {
+        labelQ.text = quizBrain.getQuestionText()
+        progresBar.progress = quizBrain.getProgress()
+        labelScore.text = "Score: \(quizBrain.getScore())"
+        buttonTrue.backgroundColor = UIColor.clear
+        buttonFalse.backgroundColor = UIColor.clear
+    
     }
 }
 
