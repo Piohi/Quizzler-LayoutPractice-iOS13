@@ -53,7 +53,7 @@ class ViewController: UIViewController {
         button.setTitle("True", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        button.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
+//        button.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
         return button
     }()
     
@@ -61,7 +61,7 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("False", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        button.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
+//        button.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundImage(for: .normal)
         
@@ -133,6 +133,7 @@ class ViewController: UIViewController {
         buttonTrue.setBackgroundImage(image2, for: .normal)
         buttonTrue.tintColor = .white
         buttonTrue.backgroundColor = colorBackground
+        buttonTrue.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
     }
     func setupFalseButton() {
         buttonFalse.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40).isActive = true
@@ -143,6 +144,7 @@ class ViewController: UIViewController {
         buttonFalse.setBackgroundImage(image2, for: .normal)
         buttonFalse.tintColor = .white
         buttonFalse.backgroundColor = colorBackground
+        buttonFalse.addTarget(self, action: #selector(buttonsTapped), for: .touchUpInside)
    
     }
     
